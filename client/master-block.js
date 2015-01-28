@@ -5,13 +5,6 @@ var ITTSTOP = 1000;
 var n = 10;
 var m = 10;
 
-//block convergence
-var maxItterations = 1000000;
-var maxResidue = 1E-9 ;
-
-var Poisson = require('poisson');
-var poisson = null;
-
 var MasterBlock = function (opts) {
   this.map = null;
   this.peerItt = {};
@@ -73,7 +66,7 @@ MasterBlock.prototype.launch = function (){
           data.blocks = blocks;
           data.map = that.map;
 
-          if (that.isBoundaryBlockY(by)){
+          if (that.isBoundaryBlockY()){
             data.h = 1/that.map.length * (1 + 1/n);
             data.n = n + 1;
             data.bc = {
@@ -89,7 +82,7 @@ MasterBlock.prototype.launch = function (){
             };
           }
           //Is this a boundary block in x?
-          if (that.isBoundaryBlockX(bx)){
+          if (that.isBoundaryBlockX()){
             data.w = 1/that.map[0].length * (1 + 1/m);
             data.m = m + 1;
 
@@ -105,19 +98,18 @@ MasterBlock.prototype.launch = function (){
           }
 
           connection.send(JSON.stringify(data));
-          console.log('Peer poisson init');
         });
       })([by,bx], conn);
     }
   }
 }
 
-MasterBlock.prototype.isBoundaryBlockY = function (by) {
-  return by === 0 || by === this.map.length - 1;
+MasterBlock.prototype.isBoundaryBlockY = function () {
+  return this.by === 0 || this.by === this.map.length - 1;
 }
 
-MasterBlock.prototype.isBoundaryBlockX = function (bx) {
-  return bx === 0 || bx === this.map[0].length - 1;
+MasterBlock.prototype.isBoundaryBlockX = function () {
+  return this.bx === 0 || this.bx === this.map[0].length - 1;
 }
 
 MasterBlock.prototype.buildBoundary = function (value, size){

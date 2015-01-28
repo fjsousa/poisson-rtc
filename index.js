@@ -3,6 +3,7 @@ var PeerServer = require('peer').PeerServer;
 var WebSocketServer = require('ws').Server;
 
 //Number of blocks
+// min: 2x2
 var blockRows = 2;
 var blockCols = 2;
 var nd = blockRows*blockCols;

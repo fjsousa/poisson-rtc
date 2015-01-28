@@ -35,7 +35,6 @@ peer.on('open', function (id) {
 peer.on('connection', function (conn) {
   conn.on('data', function(data){
     data = JSON.parse(data);
-
     signal = data.signal;
 
     //Initial
@@ -44,6 +43,12 @@ peer.on('connection', function (conn) {
       block = new Block(data);
 
       block.runPoisson();
+    }
+    //receiving boundary
+    else if (signal === 'b') {
+
+      console.log('receiving boundary')
+
     }
       //progress
     // } else if (signal === 'p') {
