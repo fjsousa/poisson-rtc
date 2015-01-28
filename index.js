@@ -1,4 +1,4 @@
-
+var Poisson = require('./lib/poisson');
 var PeerServer = require('peer').PeerServer;
 var WebSocketServer = require('ws').Server;
 
@@ -31,12 +31,19 @@ wss.on('connection', function(socket) {
         masterSocket = socket;
       }
 
+      if ( peerList.length === (nd + 1)) {
+        console.log('Launching Master...')
+        masterSocket.send(JSON.stringify({peerList: peerList, blockRows: blockRows, blockCols: blockCols}));
+      }
     }
 
-    if ( peerList.length === (nd + 1)) {
-      console.log('Launching Master...')
-      masterSocket.send(JSON.stringify({peerList: peerList, blockRows: blockRows, blockCols: blockCols}));
+    else if (msg.signal === 'block-field') {
+      console.log('field')
+      var poisson = new Poisson(msg.conditions);
+      poisson.print('./field' + msg.blocks[0] + msg.blocks[1] + '.txt', msg.field);
     }
+
+
 
   });
 });

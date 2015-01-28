@@ -26,7 +26,7 @@ var MasterBlock = function (opts) {
     that.connections[peerId] = peer.connect(peerId);
   });
 
-  this.initMap( );
+  this.initMap();
 
 };
 

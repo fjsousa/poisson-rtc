@@ -1,3 +1,5 @@
+var ws = new WebSocket("ws:localhost:9001");
+
 //stop criteria
 var ITTSTOP = 1000;
 
@@ -7,6 +9,7 @@ var m = 10;
 
 var Poisson = require('poisson');
 var poisson = null;
+
 
 var Block = function () {
   this.peerId = null;
@@ -31,7 +34,17 @@ Block.prototype.runPoisson = function(data){
     poisson.setBoundaryConditions(bc.N, bc.S, bc.E, bc.W);
     var itt = poisson.solver(block.maxItt, block.maxRes);
 
-    block.notifyMaster(itt, this.peerId);
+      // var msg = {
+      //   signal: 'block-field',
+      //   conditions: { w: data.w, h: data.h, n: data.n, m: data.m },
+      //   blocks: data.blocks,
+      //   field: poisson.u.new
+      // };
+      // ws.send(JSON.stringify(msg));
+
+
+
+    // block.notifyMaster(itt, this.peerId);
 
 
 
@@ -39,7 +52,7 @@ Block.prototype.runPoisson = function(data){
     //master keeps track of progress
     //and stops process if convergence criteria is met
 
-    block.Emit();
+    // block.Emit();
 
 
   }

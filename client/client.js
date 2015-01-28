@@ -43,7 +43,6 @@ peer.on('connection', function (conn) {
 
       block = new Block();
 
-      console.log(data);
       block.runPoisson(data);
 }
       //progress
