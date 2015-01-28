@@ -71,6 +71,7 @@ MasterBlock.prototype.launch = function (){
           var data = { signal: 'i' };
 
           data.blocks = blocks;
+          data.map = that.map;
 
           if (that.isBoundaryBlockY(by)){
             data.h = 1/that.map.length * (1 + 1/n);

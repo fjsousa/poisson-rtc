@@ -11,26 +11,25 @@ var Poisson = require('poisson');
 var poisson = null;
 
 
-var Block = function () {
+var Block = function (opts) {
+  this.bc = opts.bc;
+  this.conditions = { w: opts.w, h: opts.h, n: opts.n, m: opts.m }
   this.peerId = null;
-  this.map = null;
+  this.map = opts.map;
   this.blockRows = null;
   this.blockCols = null;
-  this.by = null;
-  this.bx = null;
+  this.by = opts.blocks[0];
+  this.bx = opts.blocks[1];
   this.converged = false;
   this.maxItt = 1000000;
   this.maxRes = 1E-9;
 };
 
-Block.prototype.runPoisson = function(data){
+Block.prototype.runPoisson = function(){
 
   if (!poisson) {
-    this.by = data.blocks[0];
-    this.bx = data.blocks[1];
-
-    var bc = data.bc;
-    poisson = new Poisson({ w: data.w, h: data.h, n: data.n, m: data.m });
+    var bc = this.bc;
+    poisson = new Poisson(this.conditions);
     poisson.setBoundaryConditions(bc.N, bc.S, bc.E, bc.W);
     var itt = poisson.solver(block.maxItt, block.maxRes);
 

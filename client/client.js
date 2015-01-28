@@ -41,10 +41,10 @@ peer.on('connection', function (conn) {
     //Initial
     if (signal === 'i'){
 
-      block = new Block();
+      block = new Block(data);
 
-      block.runPoisson(data);
-}
+      block.runPoisson();
+    }
       //progress
     // } else if (signal === 'p') {
     //   var itt = data.itt;
