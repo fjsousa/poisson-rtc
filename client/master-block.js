@@ -1,9 +1,9 @@
 //stop criteria
-var ITTSTOP = 1000;
+var ITTSTOP = 100;
 
 //core resolution, number of rows and cols
-var n = 10;
-var m = 10;
+var n = 20;
+var m = 20;
 
 var MasterBlock = function (opts) {
   this.map = null;
@@ -54,8 +54,6 @@ MasterBlock.prototype.launch = function (){
       var pId = this.map[by][bx];
       var conn = this.connections[pId];
 
-      console.log(pId, by, bx)
-
       var that = this;
 
       (function (blocks, connection) {
@@ -66,7 +64,7 @@ MasterBlock.prototype.launch = function (){
           data.blocks = blocks;
           data.map = that.map;
 
-          if (that.isBoundaryBlockY()){
+          if (isBoundaryBlockY(blocks)){
             data.h = 1/that.map.length * (1 + 1/n);
             data.n = n + 1;
             data.bc = {
@@ -82,7 +80,7 @@ MasterBlock.prototype.launch = function (){
             };
           }
           //Is this a boundary block in x?
-          if (that.isBoundaryBlockX()){
+          if (isBoundaryBlockX(blocks)){
             data.w = 1/that.map[0].length * (1 + 1/m);
             data.m = m + 1;
 
@@ -102,15 +100,16 @@ MasterBlock.prototype.launch = function (){
       })([by,bx], conn);
     }
   }
+
+  function isBoundaryBlockY(blocks) {
+    return blocks[0] === 0 || blocks[0] === that.map.length - 1;
+  }
+
+  function isBoundaryBlockX(blocks) {
+    return blocks[1] === 0 || blocks[1] === that.map[0].length - 1;
+  }
 }
 
-MasterBlock.prototype.isBoundaryBlockY = function () {
-  return this.by === 0 || this.by === this.map.length - 1;
-}
-
-MasterBlock.prototype.isBoundaryBlockX = function () {
-  return this.bx === 0 || this.bx === this.map[0].length - 1;
-}
 
 MasterBlock.prototype.buildBoundary = function (value, size){
   var array = new Array(size);

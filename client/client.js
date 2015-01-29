@@ -35,31 +35,39 @@ peer.on('open', function (id) {
 peer.on('connection', function (conn) {
   conn.on('data', function(data){
     data = JSON.parse(data);
-    signal = data.signal;
 
+    switch(data.signal) {
     //Initial
-    if (signal === 'i'){
+      case  'i':
 
-      block = new Block(data);
+        console.log('Block init.');
+        block = new Block(data);
+        block.runPoisson();
 
-      block.runPoisson();
+      //receiving boundary
+      case 'b':
+
+        console.log('Block received a border.');
+
+        block.updateBoundaries(data);
+
+        if (block.boundariesAreReady()) {
+          block.runPoisson();
+        }
+
+        //progress
+      case 'p':
+
+        console.log('Master Block judges convergence.');
+
+        // masterBlock.judgeConvergence(data.itt, data.peerId);
+
+      case 's':
+        console.log('Block is converged.');
+
+        block.converged === true
     }
-    //receiving boundary
-    else if (signal === 'b') {
 
-      console.log('receiving boundary')
-
-    }
-      //progress
-    // } else if (signal === 'p') {
-    //   var itt = data.itt;
-
-    //   masterBlock.judgeConvergence(data.itt, data.peerId);
-    // }
-
-    // else if (signal === 's') {
-    //   block.converged === true
-    // }
 
   })
 });

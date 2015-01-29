@@ -44,7 +44,5 @@ wss.on('connection', function(socket) {
       poisson.print('./field' + msg.blocks[0] + msg.blocks[1] + '.txt', msg.field);
     }
 
-
-
   });
 });
