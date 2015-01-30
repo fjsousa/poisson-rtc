@@ -1,21 +1,22 @@
 //stop criteria
-var ITTSTOP = 100;
+var ITTSTOP = 2;
 
 //core resolution, number of rows and cols
-var n = 20;
-var m = 20;
+var n = 100;
+var m = 100;
 
 var MasterBlock = function (opts) {
+  this.converged = false;
   this.map = null;
-  this.peerItt = {};
   this.connections = {};
   this.peerList = opts.peerList;
   this.blockRows = opts.blockRows;
   this.blockCols = opts.blockCols;
 
+  this.blockCountDown = opts.blockRows * opts.blockCols;
+
   that = this;
   opts.peerList.forEach(function(peerId){
-    that.peerItt[peerId] = { old: 1000000000};
     that.connections[peerId] = peer.connect(peerId);
   });
 
@@ -23,27 +24,48 @@ var MasterBlock = function (opts) {
 
 };
 
-MasterBlock.prototype.judgeConvergence = function (itt, peerId){
+MasterBlock.prototype.judgeConvergence = function (data){
 
   //Stop when first block converges
-  if ( Math.abs(this.peerItt[peerId] - itt) < ITTSTOP ) {
+  if ( data.itt < ITTSTOP ) {
 
-    //for all peers
-
-    //Stop all peers
-    this.connections.forEach(function(conn) {
-      conn.on('open', function(){
-        var data = { signal: 's' };
-        conn.send(JSON.stringify(data));
-      });
-
-    });
+    //Signal peers to emit fields
+    if (!this.converged) {
+      for (var peerId in this.connections) {
+        this.converged = true;
+        var conn = this.connections[peerId];
+        emitSignal(conn, 's');
+        console.log('signalling stop');
+      }
+    }
 
 
   } else {
-    this.peerItt[peerId] = itt;
+
+    //will wait for all blocks to
+    if (--this.blockCountDown === 0) {
+      this.resetBlockCountDown();
+
+      //send signal to run another iteration
+      //this acts as a sync stage. Blocks can't run asynchronously to each other
+      for (var peerId in this.connections) {
+        var conn = this.connections[peerId];
+        emitSignal(conn, 'c');
+      }
+
+    }
   }
 
+  function emitSignal(connection, signal) {
+      var data = { signal: signal };
+      // console.log('Connection open?',connection.open )
+      connection.send(JSON.stringify(data));
+  }
+
+}
+
+MasterBlock.prototype.resetBlockCountDown = function () {
+  this.blockCountDown = this.blockRows * this.blockCols;
 }
 
 MasterBlock.prototype.launch = function (){
@@ -61,6 +83,7 @@ MasterBlock.prototype.launch = function (){
 
           var data = { signal: 'i' };
 
+          data.masterId = that.peerList[0];
           data.blocks = blocks;
           data.map = that.map;
 

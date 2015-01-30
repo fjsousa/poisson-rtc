@@ -6,53 +6,79 @@ var Block = function (opts) {
   this.bc = opts.bc;
   this.conditions = { w: opts.w, h: opts.h, n: opts.n, m: opts.m }
   this.peerId = null;
+  this.masterId = opts.masterId;
   this.map = opts.map;
   this.blockRows = null;
   this.blockCols = null;
   this.by = opts.blocks[0];
   this.bx = opts.blocks[1];
-  this.converged = false;
-  this.maxItt = 1000000;
+  this.maxItt = 100;
   this.maxRes = 1E-9;
   this.poisson = null;
   this.connections = {};
+  this.boundaryCount = null;
+  this.continueSignal = false;
 
   this.resetCounters();
+  this.switchSignal();
 };
 
-Block.prototype.runPoisson = function(){
+Block.prototype.emitFields = function (){
 
-  console.log('Running solver at outer iteration', this.outerIteration);
+  var msg = {
+    signal: 'block-field',
+    conditions: this.conditions,
+    blocks: [this.by,this.bx],
+    field: this.poisson.u.new
+  };
+
+  ws.send(JSON.stringify(msg));
+}
+
+Block.prototype.runPoisson = function (){
 
   //initialize poisson first time
   if (!this.poisson) {
     this.poisson = new Poisson(this.conditions);
   }
 
-  var bc = this.bc;
-  this.poisson.setBoundaryConditions(bc.N, bc.S, bc.E, bc.W);
-  var itt = this.poisson.solver(this.maxItt, this.maxRes);
+  if (this.boundariesReady() && this.signalReady()) {
+    console.log('Running solver at outer iteration', ++this.outerIteration);
 
-  console.log('Poisson converged with', itt, 'iterations.');
-  this.resetCounters();
+    var bc = this.bc;
 
-  if (++this.outerIteration === 100) {
-    console.log('Sending field data to server');
-    var msg = {
-      signal: 'block-field',
-      conditions: this.conditions,
-      blocks: [this.by,this.bx],
-      field: this.poisson.u.new
-    };
-    return ws.send(JSON.stringify(msg));
+    var err = this.poisson.setBoundaryConditions(bc.N, bc.S, bc.E, bc.W);
+
+    if (err) {
+      console.error('[Error] Boundaries not set:', err);
+      return;
+    }
+
+    var output = this.poisson.solver(this.maxItt, this.maxRes);
+
+    console.log('Poisson converged with', output.iterations, 'iterations and', output.residue, 'residue');
+
+    this.switchSignal();
+    this.emit();
+    this.notifyMaster(output.iterations);
   }
 
+}
 
-  this.emit();
+Block.prototype.notifyMaster = function (itt) {
 
-  // block.notifyMaster(itt, this.peerId);
+  var data = {
+    signal: 'p',//progress
+    itt: itt
+  }
+
+  var conn = peer.connect(this.masterId);
+  conn.on('open', function () {
+    conn.send(JSON.stringify(data))
+  })
 
 }
+
 
 Block.prototype.emit = function () {
 
@@ -131,12 +157,22 @@ Block.prototype.emit = function () {
     };
 
     var peerId = that.map[by][bx];
-    var conn = !that.conditions[peerId] ? peer.connect(peerId) : that.conditions[peerId];
 
-    conn.on('open', function () {
-      console.log('Sending boundary to', peerId);
+    console.log('Sending boundary to', peerId, by, bx);
+
+    var conn;
+    if (!that.connections[peerId]) {
+      conn = peer.connect(peerId);
+      that.connections[peerId] = conn;
+        // console.log('<<<<Is the connection open?', conn.open);
+        conn.send(JSON.stringify(data));
+    } else {
+
+      //check if connection is active
+      conn = that.connections[peerId];
+      // console.log('<<<<Is the connection open?', conn.open);z
       conn.send(JSON.stringify(data));
-    });
+    }
 
   }
 
@@ -179,8 +215,16 @@ Block.prototype.resetCounters = function () {
   }
 }
 
-Block.prototype.boundariesAreReady =  function () {
-  return !--this.boundaryCount;
+Block.prototype.boundariesReady =  function () {
+  return !!this.boundaryCount;
+}
+
+Block.prototype.signalReady =  function () {
+  return this.continueSignal;
+}
+
+Block.prototype.switchSignal = function () {
+  this.continueSignal = !this.continueSignal;
 }
 
 Block.prototype.updateBoundaries = function (data) {
@@ -193,6 +237,10 @@ Block.prototype.updateBoundaries = function (data) {
     this.bc.N = data.boundary;
   } else if (data.name === 'S' ) {
     this.bc.S = data.boundary;
+  }
+
+  if (!!--this.boundaryCount) {
+    this.resetCounters();
   }
 
 }

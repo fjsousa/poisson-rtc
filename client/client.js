@@ -37,37 +37,59 @@ peer.on('connection', function (conn) {
     data = JSON.parse(data);
 
     switch(data.signal) {
-    //Initial
+    //[block] Initial
       case  'i':
 
         console.log('Block init.');
+        console.log(data)
         block = new Block(data);
         block.runPoisson();
 
-      //receiving boundary
+        break;
+
+      //[block] receiving boundary
       case 'b':
 
-        console.log('Block received a border.');
+        console.log('Block received a boundary from: ', conn.peer);
 
         block.updateBoundaries(data);
+        block.runPoisson();
+        break;
 
-        if (block.boundariesAreReady()) {
-          block.runPoisson();
-        }
-
-        //progress
+      //[master] progress
       case 'p':
 
         console.log('Master Block judges convergence.');
 
-        // masterBlock.judgeConvergence(data.itt, data.peerId);
+        data.peerId = conn.peer;
+        masterBlock.judgeConvergence(data);
 
+        break;
+
+      //[block]
       case 's':
         console.log('Block is converged.');
 
-        block.converged === true
+        block.emitFields();
+
+        break;
+      //[block]
+      case 'c': //c => signal block to proceed with iterations
+
+        console.log('Block proceeding with iteration');
+        block.switchSignal();
+        block.runPoisson();
+        break;
     }
 
 
   })
+  peer.on('disconnected', function() {
+    console.log('[Disconect] Peer disconected from the signaling server.')
+  });
+
+  peer.on('error', function() {
+    console.log('[Error] Peer error.')
+  });
 });
+
