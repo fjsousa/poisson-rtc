@@ -1,0 +1,18 @@
+{
+  "name": "poisson-webrtc",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "peer": "~0.2.8",
+    "ws": "~0.6.5",
+    "express": "~4.11.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "node lib/test/index.js",
+    "browserify": "browserify  -r ./lib/poisson.js:poisson -o lib/browser/poisson.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
