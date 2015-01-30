@@ -43,20 +43,20 @@ Block.prototype.runPoisson = function (){
   }
 
   if (this.boundariesReady() && this.signalReady()) {
-    console.log('Running solver at outer iteration', ++this.outerIteration);
+    console.log('[BLOCK] Running solver at outer iteration', ++this.outerIteration);
 
     var bc = this.bc;
 
     var err = this.poisson.setBoundaryConditions(bc.N, bc.S, bc.E, bc.W);
 
     if (err) {
-      console.error('[Error] Boundaries not set:', err);
+      console.error('[ERROR] Boundaries not set:', err);
       return;
     }
 
     var output = this.poisson.solver(this.maxItt, this.maxRes);
 
-    console.log('Poisson converged with', output.iterations, 'iterations and', output.residue, 'residue');
+    console.log('[BLOCK] Poisson converged with', output.iterations, 'iterations and', output.residue, 'residue');
 
     this.switchSignal();
     this.emit();
@@ -158,7 +158,7 @@ Block.prototype.emit = function () {
 
     var peerId = that.map[by][bx];
 
-    console.log('Sending boundary to', peerId, by, bx);
+    console.log('[BLOCK EMIT] Sending boundary to', peerId, by, bx);
 
     var conn;
     if (!that.connections[peerId]) {
