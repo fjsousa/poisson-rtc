@@ -164,13 +164,11 @@ Block.prototype.emit = function () {
     if (!that.connections[peerId]) {
       conn = peer.connect(peerId);
       that.connections[peerId] = conn;
-        // console.log('<<<<Is the connection open?', conn.open);
-        conn.send(JSON.stringify(data));
+      conn.send(JSON.stringify(data));
     } else {
 
       //check if connection is active
       conn = that.connections[peerId];
-      // console.log('<<<<Is the connection open?', conn.open);z
       conn.send(JSON.stringify(data));
     }
 

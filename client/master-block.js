@@ -2,8 +2,8 @@
 var ITTSTOP = 2;
 
 //core resolution, number of rows and cols
-var n = 100;
-var m = 100;
+var n = 10;
+var m = 10;
 
 var MasterBlock = function (opts) {
   this.converged = false;
@@ -12,15 +12,24 @@ var MasterBlock = function (opts) {
   this.peerList = opts.peerList;
   this.blockRows = opts.blockRows;
   this.blockCols = opts.blockCols;
-
+  this.connCountDown = opts.blockRows * opts.blockCols;
   this.blockCountDown = opts.blockRows * opts.blockCols;
 
   that = this;
-  opts.peerList.forEach(function(peerId){
-    that.connections[peerId] = peer.connect(peerId);
-  });
+
 
   this.initMap();
+
+  for (var i = 1; i < this.peerList.length; i++) {
+    var peerId = this.peerList[i];
+    var conn = peer.connect(peerId);
+    this.connections[peerId] = conn;
+    conn.on('open', function () {
+      if (!--that.connCountDown) {
+        that.launch();
+      }
+    });
+  }
 
 };
 
@@ -35,7 +44,7 @@ MasterBlock.prototype.judgeConvergence = function (data){
         this.converged = true;
         var conn = this.connections[peerId];
         emitSignal(conn, 's');
-        console.log('signalling stop');
+        console.log('[MASTER] signalling stop');
       }
     }
 
@@ -70,6 +79,9 @@ MasterBlock.prototype.resetBlockCountDown = function () {
 
 MasterBlock.prototype.launch = function (){
 
+  this.converged = false;
+  this.resetBlockCountDown();
+
   for (var by = 0; by < this.map.length; by++) {
     for (var bx = 0; bx < this.map[0].length; bx++) {
 
@@ -79,7 +91,7 @@ MasterBlock.prototype.launch = function (){
       var that = this;
 
       (function (blocks, connection) {
-        connection.on('open', function(){
+        // connection.on('open', function(){
 
           var data = { signal: 'i' };
 
@@ -119,7 +131,7 @@ MasterBlock.prototype.launch = function (){
           }
 
           connection.send(JSON.stringify(data));
-        });
+        // });
       })([by,bx], conn);
     }
   }

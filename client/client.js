@@ -23,7 +23,7 @@ peer.on('open', function (id) {
 
     console.log('[CLIENT] Launching Master Block...');
     masterBlock = new MasterBlock(data);
-    masterBlock.launch();
+    // masterBlock.launch();
 
   }
 });
@@ -38,7 +38,6 @@ peer.on('connection', function (conn) {
       case  'i':
 
         console.log('[CLIENT] Block init.');
-        console.log(data)
         block = new Block(data);
         block.runPoisson();
 
