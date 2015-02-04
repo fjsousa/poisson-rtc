@@ -1,9 +1,9 @@
 //stop criteria
-var ITTSTOP = 2;
+var ITTSTOP = 1;
 
 //core resolution, number of rows and cols
-var n = 10;
-var m = 10;
+var n = 20;
+var m = 20;
 
 var MasterBlock = function (opts) {
   this.converged = false;
@@ -36,13 +36,14 @@ var MasterBlock = function (opts) {
 MasterBlock.prototype.judgeConvergence = function (data){
 
   //Stop when first block converges
+  var peerId, conn;
   if ( data.itt < ITTSTOP ) {
 
     //Signal peers to emit fields
     if (!this.converged) {
-      for (var peerId in this.connections) {
+      for (peerId in this.connections) {
         this.converged = true;
-        var conn = this.connections[peerId];
+        conn = this.connections[peerId];
         emitSignal(conn, 's');
         console.log('[MASTER] signalling stop');
       }
@@ -55,10 +56,12 @@ MasterBlock.prototype.judgeConvergence = function (data){
     if (--this.blockCountDown === 0) {
       this.resetBlockCountDown();
 
+      console.log('[MASTER] signalling continue');
+
       //send signal to run another iteration
       //this acts as a sync stage. Blocks can't run asynchronously to each other
-      for (var peerId in this.connections) {
-        var conn = this.connections[peerId];
+      for (peerId in this.connections) {
+        conn = this.connections[peerId];
         emitSignal(conn, 'c');
       }
 
@@ -67,15 +70,14 @@ MasterBlock.prototype.judgeConvergence = function (data){
 
   function emitSignal(connection, signal) {
       var data = { signal: signal };
-      // console.log('Connection open?',connection.open )
       connection.send(JSON.stringify(data));
   }
 
-}
+};
 
 MasterBlock.prototype.resetBlockCountDown = function () {
   this.blockCountDown = this.blockRows * this.blockCols;
-}
+};
 
 MasterBlock.prototype.launch = function (){
 
@@ -143,7 +145,7 @@ MasterBlock.prototype.launch = function (){
   function isBoundaryBlockX(blocks) {
     return blocks[1] === 0 || blocks[1] === that.map[0].length - 1;
   }
-}
+};
 
 
 MasterBlock.prototype.buildBoundary = function (value, size){
@@ -152,7 +154,7 @@ MasterBlock.prototype.buildBoundary = function (value, size){
     array[i] = value;
   }
   return array;
-}
+};
 
 MasterBlock.prototype.initMap = function () {
 
@@ -169,4 +171,4 @@ MasterBlock.prototype.initMap = function () {
   }
 
   this.map = map;
-}
+};

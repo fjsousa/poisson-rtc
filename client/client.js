@@ -13,7 +13,7 @@ peer.on('open', function (id) {
 
   ws.onopen = function(event){
     ws.send(JSON.stringify({signal: 'id', id: id}));
-  }
+  };
 
   //The peer broker will respond with a peerList
   //and the number of blocks needed
@@ -25,67 +25,76 @@ peer.on('open', function (id) {
     masterBlock = new MasterBlock(data);
     // masterBlock.launch();
 
-  }
+  };
 });
 
 //Handle peer to peer data channel
 peer.on('connection', function (conn) {
-  conn.on('data', function(data){
-    data = JSON.parse(data);
+  conn.on('open', function () {
+    conn.on('data', function (data) {
 
-    switch(data.signal) {
-    //[block] Initial
-      case  'i':
+        data = JSON.parse(data);
 
-        console.log('[CLIENT] Block init.');
-        block = new Block(data);
-        block.runPoisson();
+        switch(data.signal) {
+        //[block] Initial
+          case  'i':
 
-        break;
+            console.log('[CLIENT] Block init.');
+            block = new Block(data);
+            block.runPoisson();
 
-      //[block] receiving boundary
-      case 'b':
+            break;
 
-        console.log('[CLIENT] Block received a boundary from: ', conn.peer);
+          //[block] receiving boundary
+          case 'b':
 
-        block.updateBoundaries(data);
-        block.runPoisson();
-        break;
+            console.log('[CLIENT] Block received a boundary from: ', conn.peer);
 
-      //[master] progress
-      case 'p':
+            block.updateBoundaries(data);
+            block.runPoisson();
+            break;
 
-        console.log('[CLIENT] Master Block judges convergence.');
+          //[master] progress
+          case 'p':
 
-        data.peerId = conn.peer;
-        masterBlock.judgeConvergence(data);
+            console.log('[CLIENT] Master Block judges convergence.');
 
-        break;
+            data.peerId = conn.peer;
+            masterBlock.judgeConvergence(data);
 
-      //[block]
-      case 's':
-        console.log('[CLIENT] Block is converged.');
+            break;
 
-        block.emitFields();
+          //[block]
+          case 's':
+            console.log('[CLIENT] Block is converged.');
 
-        break;
-      //[block]
-      case 'c': //c => signal block to proceed with iterations
+            block.emitFields();
 
-        console.log('[CLIENT] Block proceeding with iteration');
-        block.switchSignal();
-        block.runPoisson();
-        break;
-    }
+            break;
+          //[block]
+          case 'c': //c => signal block to proceed with iterations
+
+            console.log('[CLIENT] Proceed signal');
+            block.switchSignal();
+            block.runPoisson();
+            break;
+        }
 
 
-  })
-  peer.on('disconnected', function() {
-    console.log('[DISCONNECT] Peer disconected from the signaling server.')
+      });
   });
+});
 
-  peer.on('error', function() {
-    console.log('[ERROR] Peer error.')
-  });
+
+peer.on('disconnected', function() {
+  console.log('[DISCONNECT] Peer disconected from the signaling server.');
+});
+
+peer.on('error', function() {
+  console.log('[ERROR] Peer error.');
+});
+
+peer.on('close', function (){
+  console.log('[PEER CLOSE]');
 });
 
