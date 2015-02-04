@@ -1,9 +1,9 @@
 //stop criteria
-var ITTSTOP = 1;
+var ITTSTOP = 10;
 
 //core resolution, number of rows and cols
-var n = 20;
-var m = 20;
+var n = 50;
+var m = 50;
 
 var MasterBlock = function (opts) {
   this.converged = false;

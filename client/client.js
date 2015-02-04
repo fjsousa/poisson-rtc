@@ -49,9 +49,7 @@ peer.on('connection', function (conn) {
           case 'b':
 
             console.log('[CLIENT] Block received a boundary from: ', conn.peer);
-
             block.updateBoundaries(data);
-            block.runPoisson();
             break;
 
           //[master] progress
@@ -75,7 +73,6 @@ peer.on('connection', function (conn) {
           case 'c': //c => signal block to proceed with iterations
 
             console.log('[CLIENT] Proceed signal');
-            block.switchSignal();
             block.runPoisson();
             break;
         }

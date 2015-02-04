@@ -11,15 +11,13 @@ var Block = function (opts) {
   this.blockCols = null;
   this.by = opts.blocks[0];
   this.bx = opts.blocks[1];
-  this.maxItt = 2;
+  this.itt = null;
+  this.maxItt = 30;
   this.maxRes = 1E-9;
   this.connections = {};
   this.boundaryCount = null;
-  this.continueSignal = false;
   this.masterConn = null;
   this.worker = new Worker('worker.js');
-
-  this.switchSignal();
 
   var that = this;
 
@@ -28,7 +26,7 @@ var Block = function (opts) {
       return console.log('[BLOCK] error in worker.');
     }
 
-    //emit filed at the last iteration
+    //emit field at the last iteration
     if (msg.data.signal === 'field') {
 
       emitField(msg.data.u);
@@ -38,7 +36,7 @@ var Block = function (opts) {
       var output = msg.data.output;
 
       console.log('[BLOCK] Poisson converged with', output.iterations, 'iterations and', output.residue, 'residue');
-      that.notifyMaster(output.iterations);
+      that.itt = output.iterations;
 
       for (var name in msg.data.boundaries2Emit) {
         var boundaryData = msg.data.boundaries2Emit[name];
@@ -87,6 +85,7 @@ var Block = function (opts) {
 
       //check if connection is active
       conn = that.connections[peerId];
+      console.log(conn)
       // console.log('[BLOCK DEBUG] connection:', conn.open, conn, data, peerId);
       conn.send(JSON.stringify(data));
     }
@@ -101,37 +100,31 @@ Block.prototype.emitFields = function (){
 
 Block.prototype.runPoisson = function (){
 
-  if (this.boundariesReady() && this.signalReady()) {
-    this.resetCounters();
-    this.switchSignal();
-    console.log('[BLOCK] Running solver at outer iteration', ++this.outerIteration);
+  this.resetCounters();
+  console.log('[BLOCK] Running solver at outer iteration', ++this.outerIteration);
 
-    // this.calcInnerItt();
+  // this.calcInnerItt();
 
-    var workerOpts = {
-      by: this.by,
-      bx: this.bx,
-      conditions: this.conditions,
-      bc: this.bc,
-      maxItt: this.maxItt,
-      maxRes: this.maxRes,
-      map: this.map
-    };
+  var workerOpts = {
+    by: this.by,
+    bx: this.bx,
+    conditions: this.conditions,
+    bc: this.bc,
+    maxItt: this.maxItt,
+    maxRes: this.maxRes,
+    map: this.map
+  };
 
-    //Run worker
-    //boundaries are emit on returning post message
-    this.worker.postMessage(workerOpts);
-    
-
-  }
-
+  //Run worker
+  //boundaries are emited on returning post message
+  this.worker.postMessage(workerOpts);
 };
 
 Block.prototype.notifyMaster = function (itt) {
 
   var data = {
     signal: 'p',//progress
-    itt: itt
+    itt: this.itt
   };
 
   var that = this;
@@ -144,7 +137,7 @@ Block.prototype.notifyMaster = function (itt) {
 
     return;
   } 
-
+  console.log('[BLOCK] Proceed message');
   return this.masterConn.send(JSON.stringify(data));
 
 };
@@ -170,14 +163,6 @@ Block.prototype.boundariesReady =  function () {
   return !this.boundaryCount;
 };
 
-Block.prototype.signalReady =  function () {
-  return this.continueSignal;
-};
-
-Block.prototype.switchSignal = function () {
-  this.continueSignal = !this.continueSignal;
-};
-
 Block.prototype.calcInnerItt = function () {
   if (this.outerIteration < 10 ) {
       this.maxItt = 100;
@@ -200,5 +185,7 @@ Block.prototype.updateBoundaries = function (data) {
     this.bc.S = data.boundary;
   }
 
-  --this.boundaryCount;
+  if (--this.boundaryCount === 0) {
+    this.notifyMaster();
+  }
 };
