@@ -41,7 +41,6 @@ var Block = function (opts) {
       that.itt = output.iterations;
       that.res = output.residue;
       that.solverReturned = true;
-
       that.notifyMaster();
 
       for (var name in msg.data.boundaries2Emit) {
@@ -77,7 +76,7 @@ var Block = function (opts) {
 
     var peerId = that.map[by][bx];
 
-    // console.log('[BLOCK EMIT] Sending boundary to', peerId, by, bx);
+    console.log('[BLOCK EMIT] Sending boundary to', peerId, by, bx);
 
     var conn;
     if (!that.connections[peerId]) {
@@ -104,7 +103,6 @@ Block.prototype.emitFields = function (){
 };
 
 Block.prototype.runPoisson = function (){
-
   this.resetCounters();
   ++this.outerIteration;
   // console.log('[BLOCK] Running solver at outer iteration', this.outerIteration);
@@ -147,7 +145,7 @@ Block.prototype.notifyMaster = function (itt) {
 
       return;
     } 
-    // console.log('[BLOCK] Proceed message');
+    console.log('[BLOCK] Proceed message');
     return this.masterConn.send(JSON.stringify(data));
 
   }
@@ -195,16 +193,25 @@ Block.prototype.calcInnerItt = function () {
 
 Block.prototype.updateBoundaries = function (data) {
 
-  if (data.name === 'E') {
-    this.bc.E = data.boundary;
-  } else if (data.name === 'W' ) {
-    this.bc.W = data.boundary;
-  } else if (data.name === 'N' ) {
-    this.bc.N = data.boundary;
-  } else if (data.name === 'S' ) {
-    this.bc.S = data.boundary;
+  switch (data.name) {
+    case 'E':
+      this.bc.E = data.boundary;
+      break;
+    case 'W':
+      this.bc.W = data.boundary;
+      break;
+    case 'N':
+      this.bc.N = data.boundary;
+      break;
+    case 'S':
+      this.bc.S = data.boundary;
+      break;
   }
 
-  --this.boundaryCount;
+  
+  if (--this.boundaryCount < 0 ) {
+    this.boundaryCount = 0;
+  }
+
   this.notifyMaster();
 };

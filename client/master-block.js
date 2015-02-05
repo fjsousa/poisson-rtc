@@ -2,8 +2,8 @@
 var ITTSTOP = 10;
 
 //core resolution, number of rows and cols
-var n = 50;
-var m = 50;
+var n = 20;
+var m = 20;
 
 var MasterBlock = function (opts) {
   this.converged = false;
@@ -36,7 +36,7 @@ var MasterBlock = function (opts) {
 var i = 0;
 MasterBlock.prototype.judgeConvergence = function (data){
 
-  if ( ++i%100 === 0) {
+  if ( ++i%1 === 0) {
     console.log('[MASTER] Outer iteration:', data.outer, 'Inner Iterarion:', data.itt, 'res:', data.res);
   }
 
