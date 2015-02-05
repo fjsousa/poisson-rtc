@@ -5,7 +5,7 @@ var block = null;
 var peer = new Peer( {host: 'localhost', port: 9000, path: '/myapp'});
 
 peer.on('open', function (id) {
-  console.log('[CLIENT] Connect with id:', id);
+  // console.log('[CLIENT] Connect with id:', id);
 
   //The peer broker does not support peer - server comunications,
   //so we use a websocket connection instead to get all peer ids
@@ -21,7 +21,7 @@ peer.on('open', function (id) {
 
     var data = JSON.parse(msg.data);
 
-    console.log('[CLIENT] Launching Master Block...');
+    // console.log('[CLIENT] Launching Master Block...');
     masterBlock = new MasterBlock(data);
     // masterBlock.launch();
 
@@ -30,7 +30,7 @@ peer.on('open', function (id) {
 
 //Handle peer to peer data channel
 peer.on('connection', function (conn) {
-  conn.on('open', function () {
+  // conn.on('open', function () {
     conn.on('data', function (data) {
 
         data = JSON.parse(data);
@@ -39,7 +39,7 @@ peer.on('connection', function (conn) {
         //[block] Initial
           case  'i':
 
-            console.log('[CLIENT] Block init.');
+            // console.log('[CLIENT] Block init.');
             block = new Block(data);
             block.runPoisson();
 
@@ -48,14 +48,14 @@ peer.on('connection', function (conn) {
           //[block] receiving boundary
           case 'b':
 
-            console.log('[CLIENT] Block received a boundary from: ', conn.peer);
+            // console.log('[CLIENT] Block received a boundary from: ', conn.peer);
             block.updateBoundaries(data);
             break;
 
           //[master] progress
           case 'p':
 
-            console.log('[CLIENT] Master Block judges convergence.');
+            // console.log('[CLIENT] Master Block judges convergence.');
 
             data.peerId = conn.peer;
             masterBlock.judgeConvergence(data);
@@ -64,7 +64,7 @@ peer.on('connection', function (conn) {
 
           //[block]
           case 's':
-            console.log('[CLIENT] Block is converged.');
+            // console.log('[CLIENT] Block is converged.');
 
             block.emitFields();
 
@@ -72,14 +72,14 @@ peer.on('connection', function (conn) {
           //[block]
           case 'c': //c => signal block to proceed with iterations
 
-            console.log('[CLIENT] Proceed signal');
+            // console.log('[CLIENT] Proceed signal');
             block.runPoisson();
             break;
         }
 
 
       });
-  });
+  // });  
 });
 
 

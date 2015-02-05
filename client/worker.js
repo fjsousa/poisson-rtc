@@ -4,15 +4,16 @@ var Poisson = require('poisson');
 var poisson = null;
 var conditions = null;
 var map = null;
+var by, bx;
 
 self.addEventListener('message', function (msg) {
 
   if (msg.data.signal === 'field') {
-    console.error('[WORKER] Returning Field');
+    // console.log('[WORKER] Returning Field');
     return self.postMessage({ signal: 'field', u: poisson.u.new});
   }
 
-  console.error('[WORKER] Running...');
+  // console.log('[WORKER] Running...');
 
   //initialize poisson first time
   if (!poisson) {
@@ -36,8 +37,8 @@ self.addEventListener('message', function (msg) {
   var output = poisson.solver(msg.data.maxItt, msg.data.maxRes);
 
   var boundaries2Emit = {};
+  var boundary;
   if (isBoundaryBlockY(by)) {
-    var boundary;
     var peerBlockYY;
 
     if (by === 0) {
@@ -60,13 +61,12 @@ self.addEventListener('message', function (msg) {
     var peerBlockYYN = by - 1;
     var peerBlockYYS = by + 1;
 
-    boundaries2Emit['S'] = {peerBy: peerBlockYYN, peerBx: bx, boundary: boundary};
-    boundaries2Emit['N'] = {peerBy: peerBlockYYS, peerBx: bx, boundary: boundary};
+    boundaries2Emit['S'] = {peerBy: peerBlockYYN, peerBx: bx, boundary: boundaryN};
+    boundaries2Emit['N'] = {peerBy: peerBlockYYS, peerBx: bx, boundary: boundaryS};
 
   }
 
   if (isBoundaryBlockX(bx)) {
-    var boundary;
     var peerBlockXX;
 
     if (bx === 0) {
@@ -101,20 +101,20 @@ self.addEventListener('message', function (msg) {
 
 var isBoundaryBlockY = function (by) {
   return by === 0 || by === map.length - 1;
-}
+};
 
 var isBoundaryBlockX = function (bx) {
   return bx === 0 || bx === map[0].length - 1;
-}
+};
 
 var getRow = function (row) {
 
   var array = new Array(conditions.m);
   for (var i = 0; i < array.length; i++) {
-    array[i] = poisson.u.new[row*conditions.m + i]
+    array[i] = poisson.u.new[row*conditions.m + i];
   }
   return array;
-}
+};
 
 var getCol = function (col) {
 
@@ -123,4 +123,4 @@ var getCol = function (col) {
     array[i] = poisson.u.new[i*conditions.n + col];
   }
   return array;
-}
+};

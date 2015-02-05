@@ -33,10 +33,16 @@ var MasterBlock = function (opts) {
 
 };
 
+var i = 0;
 MasterBlock.prototype.judgeConvergence = function (data){
+
+  if ( ++i%100 === 0) {
+    console.log('[MASTER] Outer iteration:', data.outer, 'Inner Iterarion:', data.itt, 'res:', data.res);
+  }
 
   //Stop when first block converges
   var peerId, conn;
+
   if ( data.itt < ITTSTOP ) {
 
     //Signal peers to emit fields
@@ -56,7 +62,7 @@ MasterBlock.prototype.judgeConvergence = function (data){
     if (--this.blockCountDown === 0) {
       this.resetBlockCountDown();
 
-      console.log('[MASTER] signalling continue');
+      // console.log('[MASTER] signalling continue');
 
       //send signal to run another iteration
       //this acts as a sync stage. Blocks can't run asynchronously to each other
