@@ -42,11 +42,11 @@ self.addEventListener('message', function (msg) {
     var peerBlockYY;
 
     if (by === 0) {
-      boundary = getRow(conditions.n - 3);
+      boundary = getRow(conditions.n - 2);
       peerBlockYY = 1;
       name = 'N';
     } else {
-      boundary = getRow(2);
+      boundary = getRow(1);
       peerBlockYY = by - 1;
       name = 'S';
     }
@@ -70,11 +70,11 @@ self.addEventListener('message', function (msg) {
     var peerBlockXX;
 
     if (bx === 0) {
-      boundary = getCol(conditions.m - 3);
+      boundary = getCol(conditions.m - 2);
       peerBlockXX = 1;
       name = 'W';
     } else {
-      boundary = getCol(2);
+      boundary = getCol(1);
       peerBlockXX = bx - 1;
       name = 'E';
     }

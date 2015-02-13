@@ -37,7 +37,7 @@ peer.on('connection', function (conn) {
         //[block] Initial
           case  'i':
 
-            console.log('[CLIENT] Block init.');
+            // console.log('[CLIENT] Block init.');
             block = new Block(data);
             block.runPoisson();
 
@@ -46,7 +46,7 @@ peer.on('connection', function (conn) {
           //[block] receiving boundary
           case 'b':
 
-            console.log('[CLIENT] Block received a boundary from: ', conn.peer);
+            // console.log('[CLIENT] Block received a boundary from: ', conn.peer);
             block.updateBoundaries(data);
             break;
 
@@ -62,7 +62,7 @@ peer.on('connection', function (conn) {
 
           //[block]
           case 's':
-            console.log('[CLIENT] Block is converged.');
+            // console.log('[CLIENT] Block is converged.');
 
             block.emitFields();
 
@@ -70,7 +70,7 @@ peer.on('connection', function (conn) {
           //[block]
           case 'c': //c => signal block to proceed with iterations
 
-            console.log('[CLIENT] Proceed signal');
+            // console.log('[CLIENT] Proceed signal');
             block.runPoisson();
             break;
         }

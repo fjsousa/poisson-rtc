@@ -1,5 +1,5 @@
 //stop criteria
-var ITTSTOP = 10;
+var ITTSTOP = 2;
 
 //core resolution, number of rows and cols
 var n = 20;
@@ -36,14 +36,14 @@ var MasterBlock = function (opts) {
 var i = 0;
 MasterBlock.prototype.judgeConvergence = function (data){
 
-  if ( ++i%1 === 0) {
+  if ( ++i%100 === 0) {
     console.log('[MASTER] Outer iteration:', data.outer, 'Inner Iterarion:', data.itt, 'res:', data.res);
   }
 
   //Stop when first block converges
   var peerId, conn;
 
-  if ( data.itt < ITTSTOP ) {
+  if ( data.res < 1E-9 ) {
 
     //Signal peers to emit fields
     if (!this.converged) {
@@ -127,15 +127,15 @@ MasterBlock.prototype.launch = function (){
             data.w = 1/that.map[0].length * (1 + 1/m);
             data.m = m + 1;
 
-            data.bc.N = that.buildBoundary(0, n + 1);
-            data.bc.S = that.buildBoundary(0, n + 1);
+            data.bc.N = that.buildBoundary(0, m + 1);
+            data.bc.S = that.buildBoundary(0, m + 1);
 
           } else {
             data.w = 1/that.map[0].length * (1 + 2/m);
             data.m = m + 2;
 
-            data.bc.N = that.buildBoundary(0, n + 2);
-            data.bc.S = that.buildBoundary(0, n + 2);
+            data.bc.N = that.buildBoundary(0, m + 2);
+            data.bc.S = that.buildBoundary(0, m + 2);
           }
 
           connection.send(JSON.stringify(data));

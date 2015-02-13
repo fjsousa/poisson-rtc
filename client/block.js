@@ -12,7 +12,7 @@ var Block = function (opts) {
   this.by = opts.blocks[0];
   this.bx = opts.blocks[1];
   this.itt = null;
-  this.maxItt = 30;
+  this.maxItt = 1;
   this.maxRes = 1E-9;
   this.connections = {};
   this.boundaryCount = null;
@@ -76,7 +76,7 @@ var Block = function (opts) {
 
     var peerId = that.map[by][bx];
 
-    console.log('[BLOCK EMIT] Sending boundary to', peerId, by, bx);
+    // console.log('[BLOCK EMIT] Sending boundary to', peerId, by, bx);
 
     var conn;
     if (!that.connections[peerId]) {
@@ -145,7 +145,7 @@ Block.prototype.notifyMaster = function (itt) {
 
       return;
     } 
-    console.log('[BLOCK] Proceed message');
+    // console.log('[BLOCK] Proceed message');
     return this.masterConn.send(JSON.stringify(data));
 
   }
