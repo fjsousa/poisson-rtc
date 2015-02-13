@@ -20,8 +20,6 @@ self.addEventListener('message', function (msg) {
     poisson = new Poisson(msg.data.conditions);
     conditions = msg.data.conditions;
     map = msg.data.map;
-    by = msg.data.by;
-    bx = msg.data.bx;
   }
 
   var bc = msg.data.bc;
@@ -38,61 +36,61 @@ self.addEventListener('message', function (msg) {
 
   var boundaries2Emit = {};
   var boundary;
-  if (isBoundaryBlockY(by)) {
+  if (isBoundaryBlockY(poisson.bRow)) {
     var peerBlockYY;
 
-    if (by === 0) {
-      boundary = getRow(conditions.n - 2);
+    if (poisson.bRow === 0) {
+      boundary = getRow(poisson.bn - 2);
       peerBlockYY = 1;
       name = 'N';
     } else {
       boundary = getRow(1);
-      peerBlockYY = by - 1;
+      peerBlockYY = poisson.bRow - 1;
       name = 'S';
     }
 
-    boundaries2Emit[name] = {peerBy: peerBlockYY, peerBx: bx, boundary: boundary};
+    boundaries2Emit[name] = {peerBy: peerBlockYY, peerBx: poisson.bCol, boundary: boundary};
 
-  } else {
+  } //else {
 
-    var boundaryN = getRow(0);
-    var boundaryS = getRow(conditions.n - 1);
+  //   var boundaryN = getRow(0);
+  //   var boundaryS = getRow(conditions.n - 1);
 
-    var peerBlockYYN = by - 1;
-    var peerBlockYYS = by + 1;
+  //   var peerBlockYYN = poisson.bRow - 1;
+  //   var peerBlockYYS = poisson.bRow + 1;
 
-    boundaries2Emit['S'] = {peerBy: peerBlockYYN, peerBx: bx, boundary: boundaryN};
-    boundaries2Emit['N'] = {peerBy: peerBlockYYS, peerBx: bx, boundary: boundaryS};
+  //   boundaries2Emit['S'] = {peerBy: peerBlockYYN, peerBx: poisson.bCol, boundary: boundaryN};
+  //   boundaries2Emit['N'] = {peerBy: peerBlockYYS, peerBx: poisson.bCol, boundary: boundaryS};
 
-  }
+  // }
 
-  if (isBoundaryBlockX(bx)) {
+  if (isBoundaryBlockX(poisson.bCol)) {
     var peerBlockXX;
 
-    if (bx === 0) {
-      boundary = getCol(conditions.m - 2);
+    if (poisson.bCol === 0) {
+      boundary = getCol(poisson.bm - 2);
       peerBlockXX = 1;
       name = 'W';
     } else {
       boundary = getCol(1);
-      peerBlockXX = bx - 1;
+      peerBlockXX = poisson.bCol - 1;
       name = 'E';
     }
 
-    boundaries2Emit[name] = {peerBy: by, peerBx: peerBlockXX, boundary: boundary};
+    boundaries2Emit[name] = {peerBy: poisson.bRow, peerBx: peerBlockXX, boundary: boundary};
 
-  } else {
+  } //else {
 
-      var boundaryW = getCol(0);
-      var boundaryE = getCol(conditions.m - 1);
+  //     var boundaryW = getCol(0);
+  //     var boundaryE = getCol(conditions.m - 1);
 
-      var peerBlockYYW = bx - 1;
-      var peerBlockYYE = bx + 1;
+  //     var peerBlockYYW = poisson.bCol - 1;
+  //     var peerBlockYYE = poisson.bCol + 1;
 
-      boundaries2Emit['E'] = {peerBy: by, peerBx: peerBlockYYW, boundary: boundaryW};
-      boundaries2Emit['W'] = {peerBy: by, peerBx: peerBlockYYE, boundary: boundaryE};
+  //     boundaries2Emit['E'] = {peerBy: poisson.bRow, peerBx: peerBlockYYW, boundary: boundaryW};
+  //     boundaries2Emit['W'] = {peerBy: poisson.bRow, peerBx: peerBlockYYE, boundary: boundaryE};
 
-  }
+  // }
 
   self.postMessage({output: output, boundaries2Emit: boundaries2Emit});
 
@@ -109,18 +107,18 @@ var isBoundaryBlockX = function (bx) {
 
 var getRow = function (row) {
 
-  var array = new Array(conditions.m);
+  var array = new Array(poisson.bm);
   for (var i = 0; i < array.length; i++) {
-    array[i] = poisson.u.new[row*conditions.m + i];
+    array[i] = poisson.u.new[row*poisson.bm + i];
   }
   return array;
 };
 
 var getCol = function (col) {
 
-  var array = new Array(conditions.n);
+  var array = new Array(poisson.bn);
   for (var i = 0; i < array.length; i++) {
-    array[i] = poisson.u.new[i*conditions.n + col];
+    array[i] = poisson.u.new[i*poisson.bm + col];
   }
   return array;
 };

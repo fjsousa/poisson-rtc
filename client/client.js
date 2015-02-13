@@ -37,7 +37,7 @@ peer.on('connection', function (conn) {
         //[block] Initial
           case  'i':
 
-            // console.log('[CLIENT] Block init.');
+            console.log('[CLIENT] Block init.');
             block = new Block(data);
             block.runPoisson();
 
@@ -62,7 +62,7 @@ peer.on('connection', function (conn) {
 
           //[block]
           case 's':
-            // console.log('[CLIENT] Block is converged.');
+            console.log('[CLIENT] Block is converged.');
 
             block.emitFields();
 

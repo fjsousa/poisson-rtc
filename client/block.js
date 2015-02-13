@@ -3,7 +3,16 @@ var ws = new WebSocket("ws:localhost:9001");
 var Block = function (opts) {
   this.outerIteration = 0;
   this.bc = opts.bc;
-  this.conditions = { w: opts.w, h: opts.h, n: opts.n, m: opts.m };
+  this.conditions = { 
+    w: opts.w, 
+    h: opts.h, 
+    n: opts.n, 
+    m: opts.m,
+    bRow: opts.bRow,
+    bCol: opts.bCol,
+    bRows: opts.bRows,
+    bCols: opts.bCols
+  };
   this.peerId = null;
   this.masterId = opts.masterId;
   this.map = opts.map;
