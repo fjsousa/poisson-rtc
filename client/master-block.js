@@ -1,11 +1,16 @@
 //stop criteria
-var ITTSTOP = 2;
+var RESSTOP = 1E-9;
 
 //core resolution, number of rows and cols
-var n = 100;
-var m = 100;
+var n = 15;
+var m = 15;
 
 var MasterBlock = function (opts) {
+
+  if (opts.peerList.length < opts.blockRows*opts.blockCols) {
+    throw 'You need more ' + (opts.blockRows*opts.blockCols - opts.peerList.length) + ' peers';
+  }
+
   this.converged = false;
   this.map = null;
   this.connections = {};
@@ -17,10 +22,9 @@ var MasterBlock = function (opts) {
 
   that = this;
 
-
   this.initMap();
 
-  for (var i = 1; i < this.peerList.length; i++) {
+  for (var i = 0; i < this.peerList.length; i++) {
     var peerId = this.peerList[i];
     var conn = peer.connect(peerId);
     this.connections[peerId] = conn;
@@ -28,6 +32,14 @@ var MasterBlock = function (opts) {
       if (!--that.connCountDown) {
         that.launch();
       }
+    });
+
+    conn.on('close', function () {
+      throw 'Connection to peer closed.';
+    });
+
+    conn.on('error', function () {
+      throw 'Error on peer connection.';
     });
   }
 
@@ -43,7 +55,7 @@ MasterBlock.prototype.judgeConvergence = function (data){
   //Stop when first block converges
   var peerId, conn;
 
-  if ( data.res < 1E-9 ) {
+  if ( data.res < RESSTOP ) {
 
     //Signal peers to emit fields
     if (!this.converged) {
@@ -109,7 +121,7 @@ MasterBlock.prototype.launch = function (){
             bCols: that.map[0].length
           };
 
-          data.masterId = that.peerList[0];
+          data.masterId = peer.id;
           data.blocks = blocks;
           data.map = that.map;
 
@@ -160,7 +172,6 @@ MasterBlock.prototype.launch = function (){
   }
 };
 
-
 MasterBlock.prototype.buildBoundary = function (value, size){
   var array = new Array(size);
   for (var i = 0; i < array.length; i++) {
@@ -176,7 +187,7 @@ MasterBlock.prototype.initMap = function () {
       map[row] = new Array(this.blockCols);
   }
 
-  var i = 1;
+  var i = 0;
   for (row = 0; row < this.blockRows; row++) {
     for (col = 0; col < this.blockCols; col++) {
       map[row][col] = this.peerList[i++];

@@ -10,7 +10,18 @@ self.addEventListener('message', function (msg) {
 
   if (msg.data.signal === 'field') {
     // console.log('[WORKER] Returning Field');
-    return self.postMessage({ signal: 'field', u: poisson.u.new});
+
+    var u2d = new Array(poisson.bn);
+    for (var i = 0; i < poisson.bn; i++) { //y
+      
+      u2d[i]  = new Array(poisson.bm);
+      
+      for (var j = 0; j < poisson.bm; j++) { //x
+        u2d[i][j] =  poisson.u.new[i*poisson.bm + j];
+      }
+    }
+
+    return self.postMessage({ signal: 'field', u: u2d});
   }
 
   // console.log('[WORKER] Running...');

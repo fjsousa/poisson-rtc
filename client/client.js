@@ -1,95 +1,155 @@
+//Global var
 var masterBlock = null;
 var block = null;
+var peer;
 
-//Start Peer connection with peer broker
-var peer = new Peer( {host: 'localhost', port: 9000, path: '/myapp'});
+// var data = {
+//   peerList: peerList, 
+//   blockRows: blockRows, 
+//   blockCols: blockCols
+// };
+// masterBlock = new MasterBlock(data);
 
-peer.on('open', function (id) {
-  console.log('[CLIENT] Connect with id:', id);
 
-  //The peer broker does not support peer - server comunications,
-  //so we use a websocket connection instead to get all peer ids
-  var ws = new WebSocket("ws:localhost:9001");
+//Prefix of the experiment
+var prefix = window.location.pathname;
 
-  ws.onopen = function(event){
-    ws.send(JSON.stringify({signal: 'id', id: id}));
+var AllPeers = function (){
+
+  var that = this;
+
+  this.update = function (cb) {
+    $.get('/list'+ prefix, function(peers){
+
+      //remove master Id from peer list
+      var i = peers.indexOf(peer.id);
+      peers.splice(i, 1);
+      that.list = peers;
+
+      cb(peers);
+    });
   };
 
-  //The peer broker will respond with a peerList
-  //and the number of blocks needed
-  ws.onmessage = function (msg) {
+};
 
-    var data = JSON.parse(msg.data);
+new Fingerprint2().get(onFingerPrint);
 
-    masterBlock = new MasterBlock(data);
+function onFingerPrint(fp){
+  
+  try {
+    createPeer(fp);
+  }
+  catch (e) {
+    console.error(e);
+  }
 
-  };
-});
+}
 
-//Handle peer to peer data channel
-peer.on('connection', function (conn) {
-  // conn.on('open', function () {
-    conn.on('data', function (data) {
+function createPeer(fingerprint) {
 
-        data = JSON.parse(data);
+  //5000 - development
+  //80 - produtcion
+  var port = (location.hostname === 'localhost') ? 5000 : 80;
 
-        switch(data.signal) {
-        //[block] Initial
-          case  'i':
+  //Connect to signalling server
+  peer = new Peer(createPId(prefix, fingerprint), {host: location.hostname, port: port, path: '/api'});
 
-            console.log('[CLIENT] Block init.');
-            block = new Block(data);
-            block.runPoisson();
+  //Handle peer to peer data channel
+  peer.on('connection', function (conn) {
+    // conn.on('open', function () {
+      conn.on('data', function (data) {
 
-            break;
+          data = JSON.parse(data);
 
-          //[block] receiving boundary
-          case 'b':
+          switch(data.signal) {
+          //[block] Initial
+            case  'i':
 
-            // console.log('[CLIENT] Block received a boundary from: ', conn.peer);
-            block.updateBoundaries(data);
-            break;
+              console.log('[CLIENT] Block init.');
+              block = new Block(data);
+              block.runPoisson();
 
-          //[master] progress
-          case 'p':
+              break;
 
-            // console.log('[CLIENT] Master Block judges convergence.');
+            //[block] receiving boundary
+            case 'b':
 
-            data.peerId = conn.peer;
-            masterBlock.judgeConvergence(data);
+              // console.log('[CLIENT] Block received a boundary from: ', conn.peer);
+              block.updateBoundaries(data);
+              break;
 
-            break;
+            //[master] progress
+            case 'p':
 
-          //[block]
-          case 's':
-            console.log('[CLIENT] Block is converged.');
+              // console.log('[CLIENT] Master Block judges convergence.');
 
-            block.emitFields();
+              // data.peerId = conn.peer;
+              masterBlock.judgeConvergence(data);
 
-            break;
-          //[block]
-          case 'c': //c => signal block to proceed with iterations
+              break;
 
-            // console.log('[CLIENT] Proceed signal');
-            block.runPoisson();
-            break;
-        }
+            //[block]
+            case 's':
+              console.log('[CLIENT] Block is converged.');
+
+              block.emitFields();
+
+              break;
+            //[block]
+            case 'c': //c => signal block to proceed with iterations
+
+              // console.log('[CLIENT] Proceed signal');
+              block.runPoisson();
+              break;
+          }
 
 
-      });
-  // });  
-});
+        });
+    // });  
+  });
 
 
-peer.on('disconnected', function() {
-  console.log('[DISCONNECT] Peer disconected from the signaling server.');
-});
+  peer.on('disconnected', function() {
+    console.log('[DISCONNECT] Peer disconected from the signaling server.');
+  });
 
-peer.on('error', function() {
-  console.log('[ERROR] Peer error.');
-});
+  peer.on('error', function() {
+    console.log('[ERROR] Peer error.');
+  });
 
-peer.on('close', function (){
-  console.log('[PEER CLOSE]');
-});
+  peer.on('close', function (){
+    console.log('[PEER CLOSE]');
+  });
 
+  peer.on('open', function (id) {
+    console.log('[CLIENT] Connect with id:', id);
+  });
+
+}
+
+function createPId (namespace, fp) {
+  
+  if (typeof namespace !== 'string') 
+    throw 'namespace should be a string.';
+
+  if (namespace === '/') 
+    namespace = '/default/';
+
+  if (typeof fp !== 'string') 
+    throw 'Finger print format is not a string.';
+
+  if ( fp === null) 
+    throw 'Finger print is null.';
+
+  if ( fp === undefined) 
+    throw 'Finger print is undefined.';
+ 
+  var prefix = namespace.split('/')[1];
+
+  if (/^[a-z]+$/.test(prefix)) {
+    var id = prefix + '-' + fp + Date.now() + Math.floor( Math.random()*1000);
+    return id;        
+  } else {
+    throw 'Prefix not supported. Only letters  \'a\' to \'z\' ';
+  } 
+}

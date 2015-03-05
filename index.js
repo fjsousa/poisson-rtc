@@ -1,53 +1,66 @@
-var Poisson = require('./lib/poisson');
-var PeerServer = require('peer').PeerServer;
-var WebSocketServer = require('ws').Server;
+var http = require('http');
 var express = require('express');
-
-//Number of blocks
-// min: 2x2
-var blockRows = 2;
-var blockCols = 2;
-var nd = blockRows*blockCols;
-
-var peerServer = PeerServer({port: 9000, path: '/myapp'});
-var wss = new WebSocketServer({port: 9001});
-var peerList = [];
-var masterSocket = null;
-
-//Listen for peer connections
-peerServer.on('connection', function (id) {
-  console.log('Peer connected with id:', id);
-});
-
-
-//Listen for ws connections 
-wss.on('connection', function(socket) {
-  socket.on('message', function(msg){
-    msg = JSON.parse(msg);
-
-    if (msg.signal ==='id'){
-      peerList.push(msg.id);
-
-      //First socket is master socket
-      if (!masterSocket){
-        masterSocket = socket;
-      }
-
-      if ( peerList.length === (nd + 1)) {
-        console.log('Launching Master...');
-        masterSocket.send(JSON.stringify({peerList: peerList, blockRows: blockRows, blockCols: blockCols}));
-      }
-    }
-
-    else if (msg.signal === 'block-field') {
-      console.log('field');
-      var poisson = new Poisson(msg.conditions);
-      poisson.print('./field' + msg.blocks[0] + msg.blocks[1] + '.txt', msg.field);
-    }
-
-  });
-});
+var ExpressPeerServer = require('peer').ExpressPeerServer;
+var _ = require('underscore');
 
 var app = express();
-app.use(express.static(__dirname + '/client'));
-app.listen(process.env.PORT || 8080);
+var server = http.createServer(app);
+
+var options = {
+    debug: true,
+    allow_discovery: true
+};
+var expressPeerServer = ExpressPeerServer(server, options);
+
+app.use('/api', expressPeerServer);
+
+app.use('/:prefix', express.static(__dirname + '/client'));
+
+//List peer ids according to their prefixs
+// someprefix: [ 
+//   'default-4a78940f2f1f8b03195103a3baafc0db1425405629865787',
+//   'default-4a78940f2f1f8b03195103a3baafc0db1425405629865787'
+// ]
+// otherexperiment: [ 
+//   'otherexperiment-4a78940f2f1f8b03195103a3baafc0db1425405629865787',
+//   'otherexperiment-4a78940f2f1f8b03195103a3baafc0db1425405629865787'
+// ]
+app.use('/list/:prefix', function (req, res) {
+
+  var peers = expressPeerServer._clients.peerjs;
+
+  if (!peers) 
+    return res.json([]);
+
+  var peersKeys = Object.keys(peers); 
+  var requestPeers = [];
+
+  var prefix = req.params.prefix; 
+
+  _.filter(peersKeys, function (peerId) {
+    var peerPrefix = getPrefix(peerId);
+
+    if (peerPrefix === prefix)
+      requestPeers.push(peerId);
+  });
+
+  res.json(requestPeers);
+
+});
+
+var port = process.env.PORT || 5000;
+server.listen(port, function () {
+  console.log('Poisson WebRTC live at', port);   
+});
+
+expressPeerServer.on('connection', function (id) {
+  console.log('Peer connected with id:', id); 
+});
+
+expressPeerServer.on('disconnect', function (id) {
+  console.log('Peer %s disconnected', id);
+});
+
+function getPrefix(id){
+  return id.split('-')[0];  
+}

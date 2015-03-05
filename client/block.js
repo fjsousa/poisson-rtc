@@ -1,5 +1,3 @@
-var ws = new WebSocket("ws:localhost:9001");
-
 var Block = function (opts) {
   this.outerIteration = 0;
   this.bc = opts.bc;
@@ -40,7 +38,7 @@ var Block = function (opts) {
     //emit field at the last iteration
     if (msg.data.signal === 'field') {
 
-      emitField(msg.data.u);
+      emitField(msg.data.uMatrix);
 
     //emit boundaries and notify master block at each iteration
     } else {
@@ -54,23 +52,40 @@ var Block = function (opts) {
 
       for (var name in msg.data.boundaries2Emit) {
         var boundaryData = msg.data.boundaries2Emit[name];
-        emitToNeighbour(boundaryData.peerBy, boundaryData.peerBx, name, boundaryData.boundary);
+
+        try {
+          emitToNeighbour(boundaryData.peerBy, boundaryData.peerBx, name, boundaryData.boundary);
+        }
+        catch (e) {
+          console.error(e);
+        }
+        
       }
     }
 
-
   });
 
-  function emitField(u){
+  function emitField(uMatrix){
+    //u is a 2d array
 
-    var msg = {
-      signal: 'block-field',
-      conditions: that.conditions,
-      blocks: [that.by,that.bx],
-      field: u
-    };
+    var uString = '';
+    for (var i = 0; i < uMatrix.length; i++) { //y
+      for (var j = 0; j < uMatrix[0].length; j++) { //x
+        uString +=  '' + uMatrix[i][j] + ' ';
+      }
+      uString += '\n';
+    }
 
-    ws.send(JSON.stringify(msg));
+
+    window.URL = window.URL || window.webkitURL;
+    var blob = new Blob([uString], {type: 'text/plain'});
+
+    $("#download").attr("href", window.URL.createObjectURL(blob));
+    $("#download").attr("download", 'field-' + that.by + that.bx);
+    $("#download").css('display', 'block');
+
+
+
   }
 
   function emitToNeighbour(by, bx, name, boundary ) {
@@ -152,6 +167,14 @@ Block.prototype.notifyMaster = function (itt) {
         that.masterConn.send(JSON.stringify(data));
       });
 
+      this.masterConn.on('close', function () {
+        throw 'Connection to peer closed.';
+      });
+
+      this.masterConn.on('error', function () {
+        throw 'Error on peer connection.';
+      });
+
       return;
     } 
     // console.log('[BLOCK] Proceed message');
@@ -222,5 +245,11 @@ Block.prototype.updateBoundaries = function (data) {
     this.boundaryCount = 0;
   }
 
-  this.notifyMaster();
+  try {
+    this.notifyMaster();
+  }
+  catch (e) {
+    console.error(e);
+  }
+  
 };

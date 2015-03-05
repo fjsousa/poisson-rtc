@@ -1,18 +1,19 @@
 {
   "name": "poisson-webrtc",
-  "version": "0.0.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "Poisson WebRTC",
   "main": "index.js",
   "dependencies": {
-    "peer": "~0.2.8",
+    "peer": "^0.2.8",
     "ws": "~0.6.5",
-    "express": "^4.11.2"
+    "express": "^4.11.2",
+    "underscore": "^1.8.2"
   },
   "devDependencies": {},
   "scripts": {
     "test": "node lib/test/index.js",
     "browserify": "browserify  -r ./lib/poisson.js:poisson -o lib/browser/poisson.js"
   },
-  "author": "",
-  "license": "ISC"
+  "author": "F.J. Sousa",
+  "license": "MIT"
 }
