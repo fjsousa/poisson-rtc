@@ -5,9 +5,12 @@
   "main": "index.js",
   "dependencies": {
     "peer": "^0.2.8",
-    "ws": "~0.6.5",
     "express": "^4.11.2",
     "underscore": "^1.8.2"
+  },
+  "engines": {
+    "node": "0.10.x",
+    "npm": "2.6.x"
   },
   "devDependencies": {},
   "scripts": {
