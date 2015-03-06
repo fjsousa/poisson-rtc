@@ -21,8 +21,6 @@ self.addEventListener('message', function (msg) {
       }
     }
 
-    console.log(uMatrix, poisson)
-
     return self.postMessage({ signal: 'field', uMatrix: uMatrix});
   }
 

@@ -36,9 +36,10 @@ var MasterBlock = function (opts) {
       throw 'Connection to peer closed.';
     });
 
-    conn.on('error', function () {
-      throw 'Error on peer connection.';
+    conn.on('error', function (err) {
+      throw 'Error on peer connection:' + err;
     });
+
   }
 
 };

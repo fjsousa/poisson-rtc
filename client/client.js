@@ -111,10 +111,11 @@ function createPeer(fingerprint) {
 
   peer.on('disconnected', function() {
     console.log('[DISCONNECT] Peer disconected from the signaling server.');
+    peer.reconnect();
   });
 
-  peer.on('error', function() {
-    console.log('[ERROR] Peer error.');
+  peer.on('error', function(err) {
+    console.log('[ERROR] Peer error:',err.type);
   });
 
   peer.on('close', function (){

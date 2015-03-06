@@ -171,8 +171,8 @@ Block.prototype.notifyMaster = function (itt) {
         throw 'Connection to peer closed.';
       });
 
-      this.masterConn.on('error', function () {
-        throw 'Error on peer connection.';
+      this.masterConn.on('error', function (err) {
+        throw 'Error on peer connection ' + err;
       });
 
       return;
