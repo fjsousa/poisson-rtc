@@ -3,14 +3,6 @@ var masterBlock = null;
 var block = null;
 var peer;
 
-// var data = {
-//   peerList: peerList, 
-//   blockRows: blockRows, 
-//   blockCols: blockCols
-// };
-// masterBlock = new MasterBlock(data);
-
-
 //Prefix of the experiment
 var prefix = window.location.pathname;
 
@@ -49,7 +41,7 @@ function createPeer(fingerprint) {
 
   //5000 - development
   //80 - produtcion
-  var port = (location.hostname === 'localhost') ? 5000 : 8000;
+  var port = (location.hostname === 'localhost') ? 8080 : 8000;
 
   //Connect to signalling server
   peer = new Peer(createPId(prefix, fingerprint), {host: location.hostname, port: port, path: '/api'});
@@ -147,7 +139,7 @@ function createPId (namespace, fp) {
  
   var prefix = namespace.split('/')[1];
 
-  if (/^[a-z]+$/.test(prefix)) {
+  if (/^[A-Za-z0-9_.]+$/.test(prefix)) {
     var id = prefix + '-' + fp + Date.now() + Math.floor( Math.random()*1000);
     return id;        
   } else {
