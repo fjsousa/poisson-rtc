@@ -48,7 +48,7 @@ app.use('/list/:prefix', function (req, res) {
 
 });
 
-var port = process.env.PORT || 5000;
+var port = process.env.OPENSHIFT_NODEJS_PORT || 8080 
 server.listen(port, function () {
   console.log('Poisson WebRTC live at', port);   
 });
