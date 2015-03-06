@@ -1,10 +1,6 @@
 //stop criteria
 var RESSTOP = 1E-9;
 
-//core resolution, number of rows and cols
-var n = 15;
-var m = 15;
-
 var MasterBlock = function (opts) {
 
   if (opts.peerList.length < opts.blockRows*opts.blockCols) {
@@ -17,6 +13,8 @@ var MasterBlock = function (opts) {
   this.peerList = opts.peerList;
   this.blockRows = opts.blockRows;
   this.blockCols = opts.blockCols;
+  this.n = opts.n;
+  this.m = opts.m;
   this.connCountDown = opts.blockRows * opts.blockCols;
   this.blockCountDown = opts.blockRows * opts.blockCols;
 
@@ -127,10 +125,10 @@ MasterBlock.prototype.launch = function (){
 
           if (isBoundaryBlockY(blocks)){
             data.h = 1;
-            data.n = n; 
+            data.n = that.n; 
             data.bc = {
-              E: that.buildBoundary(0, n + 1),
-              W: that.buildBoundary(0, n + 1)
+              E: that.buildBoundary(0, that.n + 1),
+              W: that.buildBoundary(0, that.n + 1)
             };
           } //else {
           //   data.h = 1/that.map.length * (1 + 2/n);
@@ -143,10 +141,10 @@ MasterBlock.prototype.launch = function (){
           //Is this a boundary block in x?
           if (isBoundaryBlockX(blocks)){
             data.w = 1;
-            data.m = m;
+            data.m = that.m;
 
-            data.bc.N = that.buildBoundary(0, m + 1);
-            data.bc.S = that.buildBoundary(0, m + 1);
+            data.bc.N = that.buildBoundary(0, that.m + 1);
+            data.bc.S = that.buildBoundary(0, that.m + 1);
 
           } 
           // else {
