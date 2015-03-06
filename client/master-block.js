@@ -29,6 +29,7 @@ var MasterBlock = function (opts) {
     var conn = peer.connect(peerId);
     this.connections[peerId] = conn;
     conn.on('open', function () {
+      console.log('[MASTER] Opened connection to peer.');
       if (!--that.connCountDown) {
         that.launch();
       }
