@@ -10,13 +10,15 @@ var MasterBlock = function (opts) {
   this.converged = false;
   this.map = null;
   this.connections = {};
-  this.peerList = opts.peerList;
+  this.peerList = opts.peerList.splice(0,opts.blockRows*opts.blockCols);//use only necessary peers
   this.blockRows = opts.blockRows;
   this.blockCols = opts.blockCols;
   this.n = opts.n;
   this.m = opts.m;
   this.connCountDown = opts.blockRows * opts.blockCols;
   this.blockCountDown = opts.blockRows * opts.blockCols;
+  this.blockMaxRes = opts.blockMaxRes;
+  this.blockMaxItt = opts.blockMaxItt;
 
   that = this;
 
@@ -117,7 +119,9 @@ MasterBlock.prototype.launch = function (){
             bRow: blocks[0],
             bCol: blocks[1],
             bRows: that.map.length, 
-            bCols: that.map[0].length
+            bCols: that.map[0].length,
+            maxRes: that.blockMaxRes,
+            maxItt: that.blockMaxItt
           };
 
           data.masterId = peer.id;
