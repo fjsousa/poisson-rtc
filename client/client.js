@@ -44,6 +44,7 @@ function createPeer(fingerprint) {
   var port = (location.hostname === 'localhost') ? 8080 : 8000;
 
   //Connect to signalling server
+  console.log('[CLIENT] Creating peer');
   peer = new Peer(createPId(prefix, fingerprint), {host: location.hostname, port: port, path: '/api'});
 
   //Handle peer to peer data channel
