@@ -49,7 +49,7 @@ function createPeer(fingerprint) {
 
   //5000 - development
   //80 - produtcion
-  var port = (location.hostname === 'localhost') ? 5000 : 80;
+  var port = (location.hostname === 'localhost') ? 5000 : 8000;
 
   //Connect to signalling server
   peer = new Peer(createPId(prefix, fingerprint), {host: location.hostname, port: port, path: '/api'});
