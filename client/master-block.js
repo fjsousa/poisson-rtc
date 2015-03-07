@@ -1,6 +1,3 @@
-//stop criteria
-var RESSTOP = 1E-9;
-
 var MasterBlock = function (opts) {
 
   if (opts.peerList.length < opts.blockRows*opts.blockCols) {
@@ -50,9 +47,9 @@ var MasterBlock = function (opts) {
 var i = 0;
 MasterBlock.prototype.judgeConvergence = function (data){
 
-  if ( ++i%100 === 0) {
+  // if ( ++i%100 === 0) {
     console.log('[MASTER] Outer iteration:', data.outer, 'Inner Iterarion:', data.itt, 'res:', data.res);
-  }
+  // }
 
   //Stop when first block converges
   var peerId, conn;
@@ -65,7 +62,8 @@ MasterBlock.prototype.judgeConvergence = function (data){
         this.converged = true;
         conn = this.connections[peerId];
         emitSignal(conn, 's');
-        console.log('[MASTER] signalling stop');
+        tf = Date.now();
+        console.log('[MASTER] signalling stop. Time: %d sec', (tf - ts)/1000);
       }
     }
 
@@ -100,6 +98,8 @@ MasterBlock.prototype.resetBlockCountDown = function () {
 };
 
 MasterBlock.prototype.launch = function (){
+
+  ts = Date.now();
 
   this.converged = false;
   this.resetBlockCountDown();

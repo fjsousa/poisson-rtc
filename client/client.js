@@ -3,6 +3,12 @@ var masterBlock = null;
 var block = null;
 var peer;
 
+//Timer
+var ts, tf;
+
+//Outer stop criteria
+var RESSTOP = 1E-9;
+
 //Prefix of the experiment
 var prefix = window.location.pathname;
 
@@ -45,6 +51,7 @@ function createPeer(fingerprint) {
 
   //Connect to signalling server
   console.log('[CLIENT] Creating peer');
+
   peer = new Peer(createPId(prefix, fingerprint), {host: location.hostname, port: port, path: '/api'});
 
   //Handle peer to peer data channel

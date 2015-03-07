@@ -1,10 +1,10 @@
-var Poisson = require('./lib/poisson');
+var Poisson = require('poisson-solver');
 
 var conditions = {
   w: 1,
   h: 1,
-  n: 500, 
-  m: 500
+  n: 400, 
+  m: 400
 };
 
 var poisson = new Poisson(conditions);
@@ -24,7 +24,7 @@ var maxItterations = 100000000;
 var maxResidue = 1E-9 ;
 poisson.solver( maxItterations, maxResidue);
 
-poisson.print('./field.txt', poisson.u.old);
+//poisson.print('./field.txt', poisson.u.old);
 
 // poisson.analitical();
 // // poisson.print('./analitical.txt', poisson.u.analitical);

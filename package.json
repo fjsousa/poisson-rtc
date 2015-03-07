@@ -6,7 +6,8 @@
   "dependencies": {
     "peer": "^0.2.8",
     "express": "^4.11.2",
-    "underscore": "^1.8.2"
+    "underscore": "^1.8.2",
+    "poisson-solver": "git://github.com/fjsousa/poisson-solver"
   },
   "engines": {
     "node": "0.10.x",
@@ -15,7 +16,7 @@
   "devDependencies": {},
   "scripts": {
     "test": "node lib/test/index.js",
-    "browserify": "browserify  -r ./lib/poisson.js:poisson -o lib/browser/poisson.js"
+    "browserify": "browserify  -r ./node_modules/poisson-solver/poisson.js:poisson -o client/poisson.js"
   },
   "author": "F.J. Sousa",
   "license": "MIT"
