@@ -28,8 +28,8 @@ self.addEventListener('message', function (msg) {
 
   //initialize poisson first time
   if (!poisson) {
-    console.log('[WORKER] initialize poisson ...');
     poisson = new Poisson(msg.data.conditions);
+    console.log('[WORKER] initialize poisson ...');
     conditions = msg.data.conditions;
     map = msg.data.map;
   }
@@ -48,7 +48,7 @@ self.addEventListener('message', function (msg) {
 
   var boundaries2Emit = {};
   var boundary;
-  if (isBoundaryBlockY(poisson.bRow)) {
+  if (isBoundaryBlockY(poisson.bRow) && poisson.bRows > 1 ) {
     var peerBlockYY;
 
     if (poisson.bRow === 0) {
@@ -76,7 +76,7 @@ self.addEventListener('message', function (msg) {
 
   // }
 
-  if (isBoundaryBlockX(poisson.bCol)) {
+  if (isBoundaryBlockX(poisson.bCol) && poisson.bCols > 1 ) {
     var peerBlockXX;
 
     if (poisson.bCol === 0) {

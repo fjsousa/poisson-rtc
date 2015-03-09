@@ -97,12 +97,10 @@ Poisson.prototype.solver = function (maxItt, maxRes) {
       }
     }
 
-
     res = this.residue();
-    ++itt;
-    // if (++itt%500 === 0) {
-    //   console.log('Solver: iteration #', itt, 'with residue of', res);
-    // }
+    if (++itt%100 === 0) {
+      console.log('Solver: iteration #', itt, 'with residue of', res);
+    }
 
     this.swap();
 
@@ -113,8 +111,7 @@ Poisson.prototype.solver = function (maxItt, maxRes) {
 
 Poisson.prototype.setBoundaryConditions = function(N, S, E, W) {
 
-
-  if ( N.length !== this.bn || S.length !== this.bn || E.length !== this.bm || W.length !== this.bm ) {
+  if ( N.length !== this.bm || S.length !== this.bm || E.length !== this.bn || W.length !== this.bn ) {
     return 'Boundary conditions size don\'t match';
   }
 
@@ -124,8 +121,8 @@ Poisson.prototype.setBoundaryConditions = function(N, S, E, W) {
   }
 
   for (var row = 0; row < E.length; row ++ ){
-    this.u.new[row*this.bn] = this.u.old[row*this.bn] = W[row];
-    this.u.new[row*this.bn + this.bn - 1] = this.u.old[row*this.bn + this.bn - 1] = E[row];
+    this.u.new[row*this.bm] = this.u.old[row*this.bm] = W[row];
+    this.u.new[row*this.bm + this.bm - 1] = this.u.old[row*this.bm + this.bm - 1] = E[row];
 
   }
 

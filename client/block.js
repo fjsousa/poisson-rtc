@@ -14,8 +14,6 @@ var Block = function (opts) {
   this.peerId = null;
   this.masterId = opts.masterId;
   this.map = opts.map;
-  this.blockRows = null;
-  this.blockCols = null;
   this.by = opts.blocks[0];
   this.bx = opts.blocks[1];
   this.itt = null;
@@ -31,7 +29,7 @@ var Block = function (opts) {
 
   this.worker.addEventListener('message', function (msg) {
     if(msg.data.err){
-      // console.log('[BLOCK] error in worker.');
+      console.error('[WORKER] error in worker.');
       return;
     }
 
@@ -44,7 +42,7 @@ var Block = function (opts) {
     } else {
       var output = msg.data.output;
 
-      // console.log('[BLOCK] Poisson converged with', output.iterations, 'iterations and', output.residue, 'residue');
+      // console.log('[BLOCK DEBUG] Poisson converged with', output.iterations, 'iterations and', output.residue, 'residue');
       that.itt = output.iterations;
       that.res = output.residue;
       that.solverReturned = true;
@@ -87,10 +85,9 @@ var Block = function (opts) {
       by: by,
       name: name
     };
-
     var peerId = that.map[by][bx];
 
-    // console.log('[BLOCK EMIT] Sending boundary to', peerId, by, bx);
+    // console.log('[BLOCK DEBUG] Sending boundary to', peerId, by, bx);
 
     var conn;
     if (!that.connections[peerId]) {
@@ -126,7 +123,7 @@ Block.prototype.emitFields = function (){
 Block.prototype.runPoisson = function (){
   this.resetCounters();
   ++this.outerIteration;
-  // console.log('[BLOCK] Running solver at outer iteration', this.outerIteration);
+  // console.log('[BLOCK DEBUG] Running solver at outer iteration', this.outerIteration);
 
   // this.calcInnerItt();
 
@@ -174,7 +171,7 @@ Block.prototype.notifyMaster = function (itt) {
 
       return;
     } 
-    // console.log('[BLOCK] Proceed message');
+    // console.log('[BLOCK DEBUG] Proceed message');
     return this.masterConn.send(JSON.stringify(data));
 
   }
@@ -200,6 +197,12 @@ Block.prototype.resetCounters = function () {
   } else {
     this.boundaryCount = 4;
   }
+
+  if(this.isBoundaryBlockY() && this.conditions.bCols === 1 )
+    this.boundaryCount = 1;
+
+  if(this.isBoundaryBlockX() && this.conditions.bRows === 1 )
+    this.boundaryCount = 1;
 };
 
 Block.prototype.boundariesReady =  function () {
