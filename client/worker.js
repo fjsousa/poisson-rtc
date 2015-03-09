@@ -28,6 +28,7 @@ self.addEventListener('message', function (msg) {
 
   //initialize poisson first time
   if (!poisson) {
+    console.log('[WORKER] initialize poisson ...');
     poisson = new Poisson(msg.data.conditions);
     conditions = msg.data.conditions;
     map = msg.data.map;

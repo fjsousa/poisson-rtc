@@ -101,6 +101,10 @@ function createPeer(fingerprint) {
               // console.log('[CLIENT] Proceed signal');
               block.runPoisson();
               break;
+
+            case 'f': //f => master receives a worker peer field
+              masterBlock.downloadLink(data);
+              break;
           }
 
 

@@ -68,24 +68,14 @@ var Block = function (opts) {
   function emitField(uMatrix){
     //u is a 2d array
 
-    var uString = '';
-    for (var i = 0; i < uMatrix.length; i++) { //y
-      for (var j = 0; j < uMatrix[0].length; j++) { //x
-        uString +=  '' + uMatrix[i][j] + ' ';
-      }
-      uString += '\n';
-    }
+    var data = {
+      signal: 'f',
+      uMatrix: uMatrix,
+      by: that.by,
+      bx: that.bx
+    };
 
-
-    window.URL = window.URL || window.webkitURL;
-    var blob = new Blob([uString], {type: 'text/plain'});
-
-    $("#download").attr("href", window.URL.createObjectURL(blob));
-    $("#download").attr("download", 'field-' + that.by + that.bx);
-    $("#download").css('display', 'block');
-
-
-
+    that.masterConn.send(JSON.stringify(data));
   }
 
   function emitToNeighbour(by, bx, name, boundary ) {
@@ -110,9 +100,16 @@ var Block = function (opts) {
         conn.send(JSON.stringify(data));        
       });
 
+      conn.on('close', function () {
+        throw 'Connection to peer closed.';
+      });
+
+      conn.on('error', function (err) {
+        throw 'Error on peer connection ' + err;
+      });
+
     } else {
 
-      //check if connection is active
       conn = that.connections[peerId];
       // console.log('[BLOCK DEBUG] connection:', conn.open, conn, data, peerId);
       conn.send(JSON.stringify(data));
@@ -168,11 +165,11 @@ Block.prototype.notifyMaster = function (itt) {
       });
 
       this.masterConn.on('close', function () {
-        throw 'Connection to peer closed.';
+        throw 'Connection to Master peer closed.';
       });
 
       this.masterConn.on('error', function (err) {
-        throw 'Error on peer connection ' + err;
+        throw 'Error on Master peer connection ' + err;
       });
 
       return;

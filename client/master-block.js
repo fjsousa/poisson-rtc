@@ -200,3 +200,29 @@ MasterBlock.prototype.initMap = function () {
 
   this.map = map;
 };
+
+MasterBlock.prototype.downloadLink = function (data) {
+
+    var uString = '';
+    for (var i = 0; i < data.uMatrix.length; i++) { //y
+      for (var j = 0; j < data.uMatrix[0].length; j++) { //x
+        uString +=  '' + data.uMatrix[i][j] + ' ';
+      }
+      uString += '\n';
+    }
+
+    window.URL = window.URL || window.webkitURL;
+    var blob = new Blob([uString], {type: 'text/plain'});
+
+    var a = $(document.createElement('a'));
+
+    a.attr("href", window.URL.createObjectURL(blob));
+
+    var filename = 'field-' + data.by + data.bx + '.txt';
+    a.attr("download", filename);
+    a.html(filename);
+
+    a.appendTo('body');
+    $(document.createElement('br')).appendTo('body');
+
+}
