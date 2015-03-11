@@ -18,7 +18,7 @@ Launch server with
 
 Open tree tabs in 
 
-`http://localhost:8080/:experiment123`
+`http://localhost:8080/experiment123`
 
 Open the console in one of the tabs and write 
 
@@ -40,6 +40,14 @@ new AllPeers().update(function(peers){
 When the process finishes, you'll get a download link for each block, in this case, 4:
 
 ![Solution](https://raw.githubusercontent.com/fjsousa/poisson-rtc/master/docs/solution.png "Solution")
+
+###Open shift
+
+This code is hosted on openshift and you can carry out the same experiment with
+
+`
+http://poissonwebrtc-fjsousa.rhcloud.com/experiement123
+`
 
 
 
