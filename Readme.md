@@ -39,7 +39,7 @@ new AllPeers().update(function(peers){
 ```
 When the process finishes, you'll get a download link for each block, in this case, 4:
 
-!(Solution)[https://raw.githubusercontent.com/fjsousa/poisson-rtc/master/docs/solution.png "Solution"]
+![Solution](https://raw.githubusercontent.com/fjsousa/poisson-rtc/master/docs/solution.png "Solution")
 
 
 
