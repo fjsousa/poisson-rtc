@@ -17,7 +17,8 @@
   "scripts": {
     "test": "node lib/test/index.js",
     "browserify": "browserify  -r ./node_modules/poisson-solver/poisson.js:poisson -o client/poisson.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "install-all": "npm install; npm run browserify"
   },
   "author": "F.J. Sousa",
   "license": "MIT"
