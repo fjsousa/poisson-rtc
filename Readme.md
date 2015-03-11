@@ -25,8 +25,8 @@ Open the console in one of the tabs and write
 ```Javascript
 var opts = {
   peerList: peers,    //your peers
-  blockRows: 2,       //number of rows blocks
-  blockCols: 2,       //number of cols blocks
+  blockRows: 2,       //number of block rows 
+  blockCols: 2,       //number of block cols
   n: 50,              //number of rows of each block 
   m: 50,              //number of cols of each block
   blockMaxRes: 1E-9,  //inner solver stopping criteria 
@@ -37,6 +37,9 @@ new AllPeers().update(function(peers){
   masterBlock = new MasterBlock(opts);
 })
 ```
+When the process finishes, you'll get a download link for each block, in this case, 4:
+
+!(Solution)[https://raw.githubusercontent.com/fjsousa/poisson-rtc/master/docs/solution.png "Solution"]
 
 
 
