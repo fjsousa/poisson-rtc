@@ -37,6 +37,15 @@ new AllPeers().update(function(peers){
   masterBlock = new MasterBlock(opts);
 })
 ```
+
+If something goes wrong just write
+
+```
+masterBlock.reload();
+```
+
+to reload all tabs and reconnect the peers.
+
 When the process finishes, you'll get a download link for each block, in this case, 4:
 
 ![Solution](https://raw.githubusercontent.com/fjsousa/poisson-rtc/master/docs/solution.png "Solution")
