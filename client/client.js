@@ -74,7 +74,8 @@ function createPeer(fingerprint) {
             //[block] receiving boundary
             case 'b':
 
-              // console.log('[CLIENT] Block received a boundary from: ', conn.peer);
+              // console.log('[CLIENT] Block received a boundary from: ', conn.peer, Date.now());
+
               block.updateBoundaries(data);
               break;
 
@@ -104,6 +105,10 @@ function createPeer(fingerprint) {
 
             case 'f': //f => master receives a worker peer field
               masterBlock.downloadLink(data);
+              break;
+
+            case 'r':
+              location.reload();
               break;
           }
 

@@ -225,4 +225,13 @@ MasterBlock.prototype.downloadLink = function (data) {
     a.appendTo('body');
     $(document.createElement('br')).appendTo('body');
 
-}
+};
+
+MasterBlock.prototype.reload = function () {
+
+  for(var pId in this.connections) {
+    var conn = this.connections[pId];
+    conn.send(JSON.stringify({signal: 'r'}));  
+  } 
+  location.reload();
+};
