@@ -16,7 +16,8 @@
   "devDependencies": {},
   "scripts": {
     "test": "node lib/test/index.js",
-    "browserify": "browserify  -r ./node_modules/poisson-solver/poisson.js:poisson -o client/poisson.js"
+    "browserify": "browserify  -r ./node_modules/poisson-solver/poisson.js:poisson -o client/poisson.js",
+    "start": "node index.js"
   },
   "author": "F.J. Sousa",
   "license": "MIT"
