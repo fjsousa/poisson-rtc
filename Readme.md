@@ -2,7 +2,7 @@
 
 Client based, distributed CFD solver. 
 
-There's a [blog post](fjsousa.github.io/webrtc-part2.html) which covers the why and the how.
+There's a [blog post](//fjsousa.github.io/webrtc-part2.html) which covers the why and the how.
 
 ###Install
 
