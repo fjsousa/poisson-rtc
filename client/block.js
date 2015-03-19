@@ -33,6 +33,8 @@ var Block = function (opts) {
       return;
     }
 
+    // console.log('[BLOCK DEBUG]after worker post', Date.now());
+
     //emit field at the last iteration
     if (msg.data.signal === 'field') {
 
@@ -94,6 +96,7 @@ var Block = function (opts) {
       conn = peer.connect(peerId);
       conn.on('open', function (){
         that.connections[peerId] = conn;
+        // console.log('[BLOCK DEBUG] emit sending to', peerId, Date.now());
         conn.send(JSON.stringify(data));        
       });
 
@@ -123,7 +126,7 @@ Block.prototype.emitFields = function (){
 Block.prototype.runPoisson = function (){
   this.resetCounters();
   ++this.outerIteration;
-  // console.log('[BLOCK DEBUG] Running solver at outer iteration', this.outerIteration);
+  // console.log('[BLOCK DEBUG] Running solver at outer iteration', this.outerIteration, Date.now());
 
   // this.calcInnerItt();
 

@@ -7,7 +7,7 @@
     "peer": "^0.2.8",
     "express": "^4.11.2",
     "underscore": "^1.8.2",
-    "poisson-solver": "git://github.com/fjsousa/poisson-solver"
+    "poisson-solver": "git://github.com/fjsousa/poisson-solver#gauss-sidel"
   },
   "engines": {
     "node": "0.10.x",

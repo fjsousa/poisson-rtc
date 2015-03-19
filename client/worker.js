@@ -24,7 +24,7 @@ self.addEventListener('message', function (msg) {
     return self.postMessage({ signal: 'field', uMatrix: uMatrix});
   }
 
-  // console.log('[WORKER] Running...');
+  // console.log('[WORKER DEBUG] Running...', Date.now());
 
   //initialize poisson first time
   if (!poisson) {
@@ -45,6 +45,8 @@ self.addEventListener('message', function (msg) {
   }
 
   var output = poisson.solver(msg.data.maxItt, msg.data.maxRes);
+
+  // console.log('[WORKER DEBUG] Solver finished.', Date.now());
 
   var boundaries2Emit = {};
   var boundary;
@@ -104,6 +106,7 @@ self.addEventListener('message', function (msg) {
 
   // }
 
+  // console.log('[WORKER DEBUG] before worker post', Date.now());
   self.postMessage({output: output, boundaries2Emit: boundaries2Emit});
 
 

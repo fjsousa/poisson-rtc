@@ -47,7 +47,7 @@ var MasterBlock = function (opts) {
 var i = 0;
 MasterBlock.prototype.judgeConvergence = function (data){
 
-  if ( ++i%100 === 0) {
+  if ( data.outer%1 === 0) {
     console.log('[MASTER] Outer iteration:', data.outer, 'Inner Iterarion:', data.itt, 'res:', data.res);
   }
 

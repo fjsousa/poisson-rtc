@@ -1,5 +1,9 @@
 #WebRTC Poisson solver
 
+Client based, distributed CFD solver. 
+
+There's a [blog post](fjsousa.github.io/webrtc-part2.html) which covers the why and the how.
+
 ###Install
 
 Clone the repository and type:
@@ -57,6 +61,10 @@ This code is hosted on openshift and you can carry out the same experiment with
 `
 http://poissonwebrtc-fjsousa.rhcloud.com/experiement123
 `
+
+###Caveats
+
+*Quick inner iterations: When the inner iteration cycle is very quick, 
 
 
 
