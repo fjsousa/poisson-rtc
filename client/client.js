@@ -74,7 +74,7 @@ function createPeer(fingerprint) {
             //[block] receiving boundary
             case 'b':
 
-              console.log('[CLIENT DEBUG] Block received a boundary from: ', conn.peer, Date.now());
+              // console.log('[CLIENT DEBUG] Block received a boundary from: ', conn.peer, Date.now());
 
               block.updateBoundaries(data);
               break;
@@ -82,7 +82,7 @@ function createPeer(fingerprint) {
             //[master] progress
             case 'p':
 
-              console.log('[CLIENT DEBUG] Master Block judges convergence.');
+              // console.log('[CLIENT DEBUG] Master Block judges convergence.');
 
               // data.peerId = conn.peer;
               masterBlock.judgeConvergence(data);
@@ -99,7 +99,7 @@ function createPeer(fingerprint) {
             //[block]
             case 'c': //c => signal block to proceed with iterations
 
-              console.log('[CLIENT DEBUG] Proceed signal');
+              // console.log('[CLIENT DEBUG] Proceed signal');
               block.runPoisson();
               break;
 
