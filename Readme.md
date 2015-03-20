@@ -27,17 +27,18 @@ Open tree tabs in
 Open the console in one of the tabs and write 
 
 ```Javascript
-var opts = {
-  peerList: peers,    //your peers
-  blockRows: 2,       //number of block rows 
-  blockCols: 2,       //number of block cols
-  n: 50,              //number of rows of each block 
-  m: 50,              //number of cols of each block
-  blockMaxRes: 1E-9,  //inner solver stopping criteria 
-  blockMaxItt: 60     //inner solver stopping criteria 
-};
-
 new AllPeers().update(function(peers){
+
+  var opts = {
+    peerList: peers,    //your peers
+    blockRows: 2,       //number of block rows 
+    blockCols: 2,       //number of block cols
+    n: 50,              //number of rows of each block 
+    m: 50,              //number of cols of each block
+    blockMaxRes: 1E-9,  //inner solver stopping criteria 
+    blockMaxItt: 60     //inner solver stopping criteria 
+  };
+
   masterBlock = new MasterBlock(opts);
 })
 ```
@@ -61,11 +62,3 @@ This code is hosted on openshift and you can carry out the same experiment with
 `
 http://poissonwebrtc-fjsousa.rhcloud.com/experiement123
 `
-
-###Caveats
-
-*Quick inner iterations: When the inner iteration cycle is very quick, 
-
-
-
-
